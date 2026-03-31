@@ -1,0 +1,1106 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 61,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Devices Detected"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "color"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 300
+              },
+              {
+                "id": "max"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sensor"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "A306": {
+                        "index": 0,
+                        "text": "Room D (A306)"
+                      },
+                      "A320": {
+                        "index": 1,
+                        "text": "Room C (A302)"
+                      },
+                      "A322": {
+                        "index": 2,
+                        "text": "VIP Room (A322)"
+                      },
+                      "B324": {
+                        "index": 3,
+                        "text": "Room A (B324)"
+                      },
+                      "B326": {
+                        "index": 4,
+                        "text": "Room B (B326)"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 176
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "Active": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "Inactive": {
+                        "color": "red",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Last Measurement"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeFromNow"
+              },
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "frameIndex": 2,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Sensor"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+          },
+          "query": "from(bucket: \"ICUFNDB\")\r\n  |> range(start: 2025-07-03T16:35:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> last()\r\n  |> group(columns: [])\r\n  |> drop(columns: [\"_start\", \"_stop\"])\r\n  |> filter(fn: (r) => r[\"sensor_name\"] != \"B332\")\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      sensor_status: if (uint(v: now()) - uint(v: r._time)) <= 600000000000 then \"Active\" else \"Inactive\"\r\n  }))",
+          "refId": "A"
+        }
+      ],
+      "title": "General Information",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_field": true,
+              "_measurement": true,
+              "_measurement_detections": true,
+              "_measurement_locations": true,
+              "_measurement_t1": true,
+              "_measurement_t2": true,
+              "_time_detections": false,
+              "_time_locations": true,
+              "_time_t1": true,
+              "ip_address": true,
+              "ipaddress": true,
+              "latitude": true,
+              "location": true,
+              "longitude": true,
+              "macAddress": true,
+              "sensor_UUID": true,
+              "sensor_name": false,
+              "sensor_uuid": true,
+              "sensor_uuid_detections": true,
+              "sensor_uuid_locations": true,
+              "technology": true,
+              "tecnology": true,
+              "type_data": true
+            },
+            "indexByName": {
+              "_field": 6,
+              "_measurement": 7,
+              "_time": 2,
+              "_value": 3,
+              "ip_address": 1,
+              "sensor_name": 0,
+              "sensor_status": 4,
+              "sensor_uuid": 8,
+              "technology": 5
+            },
+            "renameByName": {
+              "_time": "Last Measurement",
+              "_time_detections": "Last Measurement",
+              "_time_t2": "Last Measurement",
+              "_value": "Devices Detected",
+              "device": "Sensor Name",
+              "devices_detected": "Devices Detected",
+              "ipAddress": "IP Address",
+              "ip_address": "IP Address",
+              "numdetections": "Devices Detected",
+              "sensor_name": "Sensor",
+              "sensor_status": "Status",
+              "tecnology": "Technology"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latitude"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Longitude"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sensor"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "A320": {
+                        "index": 0,
+                        "text": "A302"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 9,
+      "options": {
+        "basemap": {
+          "config": {
+            "server": "world-imagery"
+          },
+          "name": "Layer 0",
+          "type": "esri-xyz"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "blur": 50,
+              "radius": 41,
+              "weight": {
+                "fixed": 1,
+                "max": 1,
+                "min": 0
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Detections",
+            "opacity": 1,
+            "tooltip": true,
+            "type": "heatmap"
+          },
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "fixed": "#ffffff"
+                },
+                "opacity": 0,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 1,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "text": {
+                  "field": "Devices Detected",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14,
+                  "offsetX": 0,
+                  "offsetY": -5,
+                  "textAlign": "center",
+                  "textBaseline": "bottom"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Number",
+            "tooltip": false,
+            "type": "markers"
+          },
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "fixed": "#ffffff"
+                },
+                "opacity": 0,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "field": "",
+                  "fixed": "",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "text": {
+                  "field": "Sensor",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14,
+                  "offsetX": 0,
+                  "offsetY": -30,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Names",
+            "tooltip": false,
+            "type": "markers"
+          }
+        ],
+        "tooltip": {
+          "mode": "none"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lat": 38.748047,
+          "lon": -9.152505,
+          "noRepeat": false,
+          "zoom": 19.36
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+          },
+          "query": "t1 = from(bucket: \"ICUFNDB\")\r\n  |> range(start: 2025-07-03T15:35:10Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensorLocation\" )\r\n  |> drop(columns:[\"_start\", \"_stop\"])\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> group()\r\n\r\n\r\nt2 = from(bucket: \"ICUFNDB\")\r\n  |> range(start: 2025-07-03T16:35:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> last()\r\n  |> group(columns: [])\r\n  |> drop(columns: [\"_start\", \"_stop\"])\r\n\r\n\r\njoin( tables: {Locations: t1, Detections: t2}, on: [\"sensor_name\"])\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> last(column: \"sensor_name\")\r\n  |> group()",
+          "refId": "A"
+        }
+      ],
+      "title": "CVTT Crowding Geodistribution",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_field": true,
+              "_measurement_Detections": true,
+              "_measurement_Locations": true,
+              "_time_Locations": true,
+              "sensor_UUID": true,
+              "sensor_uuid": true,
+              "sensor_uuid_t1": true,
+              "sensor_uuid_t2": true,
+              "technology": true
+            },
+            "indexByName": {
+              "_field": 6,
+              "_measurement_Detections": 8,
+              "_measurement_Locations": 9,
+              "_time_Detections": 2,
+              "_time_Locations": 7,
+              "_value": 3,
+              "ip_address": 1,
+              "latitude": 4,
+              "longitude": 5,
+              "sensor_UUID": 11,
+              "sensor_name": 0,
+              "sensor_uuid": 10,
+              "technology": 12
+            },
+            "renameByName": {
+              "_time_Detections": "Last Measurement",
+              "_value": "Devices Detected",
+              "devices_detected": "Devices Detected",
+              "ip_address": "IP Address",
+              "latitude": "Latitude",
+              "longitude": "Longitude",
+              "sensor_name": "Sensor",
+              "technology": "Technology"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#1fa9ac",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 26,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "RaspberryPi1": {
+                  "index": 0,
+                  "text": "Study Room"
+                },
+                "RaspberryPi2": {
+                  "index": 1,
+                  "text": "Outdoor Passage"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "(Select a value in 'Sensor' variable)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A306"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room D (A306)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A320"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room C (A302)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A322"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "VIP Room (A322)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "B324"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room A (B324)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "B326"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room B (B326)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+          },
+          "query": "import \"math\"\r\n\r\nfrom(bucket: \"ICUFNDB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"devices_detected\")\r\n  |> filter(fn: (r) => r[\"sensor_name\"] != \"B332\")\r\n  |> filter(fn: (r) => contains(value: r[\"sensor_name\"], set: ${Sensor:json}))\r\n  |> aggregateWindow(every: 30m, fn: mean, createEmpty: false)\r\n  |> map(fn: (r) => ({r with _value: int(v: math.round(x: r._value)), _time:r._time, _field:r.sensor_name}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Records (30 minutes)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "custom": {
+            "calculation": "mean",
+            "colorPalette": "interpolateRdYlGn",
+            "colorSpace": "rgb",
+            "groupBy": 60,
+            "invertPalette": true,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 10,
+      "options": {
+        "from": "0",
+        "legendGradientQuality": "high",
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "to": "0"
+      },
+      "pluginVersion": "2.0.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+          },
+          "query": "from(bucket: \"ICUFNDB\")\r\n  |> range(start: 2025-07-03T15:35:10Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> filter(fn: (r) => contains(value: r[\"sensor_name\"], set: ${Sensor:json}))\r\n  |> drop(columns:[\"_start\", \"_stop\"])\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> group()",
+          "refId": "A"
+        }
+      ],
+      "title": "CVTT Heatmap",
+      "transparent": true,
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#1fa9ac",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 26,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "RaspberryPi1": {
+                  "index": 0,
+                  "text": "Study Room"
+                },
+                "RaspberryPi2": {
+                  "index": 1,
+                  "text": "Outdoor Passage"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "(Select a value in 'Sensor' variable)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A306"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room D (A306)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A320"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room C (A302)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "A322"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "VIP Room (A322)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "B324"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room A (B324)"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "B326"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Room B (B326)"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+          },
+          "query": "import \"math\"\r\n\r\nfrom(bucket: \"ICUFNDB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"devices_detected\")\r\n  |> filter(fn: (r) => r[\"sensor_name\"] != \"B332\")\r\n  |> filter(fn: (r) => contains(value: r[\"sensor_name\"], set: ${Sensor:json}))\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean)\r\n  //|> movingAverage(n: 3)\r\n  |> map(fn: (r) => ({_value:r._value, _time:r._time, _field:r.sensor_name}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Last Records (5 minutes)",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 6,
+      "options": {
+        "activeTheme": "CVTT Theme",
+        "disableThemePicker": true,
+        "themes": [
+          {
+            "name": "RESETTING Theme",
+            "styles": [
+              {
+                "props": {
+                  "theme": "default"
+                },
+                "type": "basetheme"
+              },
+              {
+                "props": {
+                  "url": "https://i.imgur.com/XYpO2Kh.png"
+                },
+                "type": "bgimage"
+              },
+              {
+                "props": {
+                  "url": ""
+                },
+                "type": "url"
+              },
+              {
+                "props": {
+                  "text": ""
+                },
+                "type": "style"
+              }
+            ]
+          },
+          {
+            "name": "CVTT Theme",
+            "styles": [
+              {
+                "props": {
+                  "theme": "default"
+                },
+                "type": "basetheme"
+              },
+              {
+                "props": {
+                  "url": "https://i.imgur.com/KQaTKPJ.jpeg"
+                },
+                "type": "bgimage"
+              },
+              {
+                "props": {
+                  "url": ""
+                },
+                "type": "url"
+              },
+              {
+                "props": {
+                  "text": ""
+                },
+                "type": "style"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginVersion": "0.2.1",
+      "title": "",
+      "transparent": true,
+      "type": "yesoreyeram-boomtheme-panel"
+    }
+  ],
+  "preload": false,
+  "refresh": "10s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "bc0238cc-f395-401b-8147-a73fe8646fc2"
+        },
+        "definition": "from(bucket: \"ICUFNDB\")\r\n  |> range(start: 2023-11-20T11:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> distinct(column: \"sensor_name\")\r\n  |> group()",
+        "includeAll": true,
+        "label": "Sensor",
+        "multi": true,
+        "name": "Sensor",
+        "options": [],
+        "query": "from(bucket: \"ICUFNDB\")\r\n  |> range(start: 2023-11-20T11:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> distinct(column: \"sensor_name\")\r\n  |> group()",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "2025-07-09T06:00:00.000Z",
+    "to": "2025-07-09T18:00:00.000Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Conference ICUFN2025 Dashboard",
+  "uid": "d32d3be4-6e59-4ef4-a051-e195db23747e",
+  "version": 63
+}

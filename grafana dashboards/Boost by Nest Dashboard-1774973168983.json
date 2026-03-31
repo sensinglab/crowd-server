@@ -1,0 +1,938 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 71,
+  "links": [],
+  "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 6,
+        "y": 0
+      },
+      "id": 17,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "<div style=\"\n  margin: 0;\n  padding: 0;\n  position: relative;\n  top: -26px;\n  display: flex;\n  align-items: center;\n  gap: 24px;\n\">\n\n  <!-- LOGO -->\n  <img \n    src=\"https://www.nestboost.pt/wp-content/uploads/2025/09/logo_full_black-color-scaled.png\"\n    alt=\"NestBoost\"\n    style=\"\n      height: 20;\n      max-width: 150;\n      object-fit: contain;\n    \"\n  />\n\n\n</div>\n",
+        "mode": "html"
+      },
+      "pluginVersion": "12.3.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 6,
+      "options": {
+        "activeTheme": "Boost",
+        "disableThemePicker": true,
+        "themes": [
+          {
+            "name": "Boost",
+            "styles": [
+              {
+                "props": {
+                  "theme": "default"
+                },
+                "type": "basetheme"
+              },
+              {
+                "props": {
+                  "url": "https://i.imgur.com/0JZboEn.png"
+                },
+                "type": "bgimage"
+              },
+              {
+                "props": {
+                  "url": ""
+                },
+                "type": "url"
+              },
+              {
+                "props": {
+                  "text": ""
+                },
+                "type": "style"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginVersion": "0.2.1",
+      "title": "",
+      "transparent": true,
+      "type": "yesoreyeram-boomtheme-panel"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ef9o1c6yvod8ga"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "fieldMinMax": true,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 19,
+        "w": 11,
+        "x": 0,
+        "y": 7
+      },
+      "id": 15,
+      "options": {
+        "afterRender": "",
+        "content": "<div style=\"\n  position: relative;\n  width: 100%;\n  padding-top: 62.85%;\n  background-image: url('/public/img/bg/pisocima_v3.jpg');\n  background-size: contain;\n  background-repeat: no-repeat;\n  background-position: center;\n\">\n\n  {{#each data}}\n\n  {{#if (eq sensor_name \"LearningRoom\")}}\n  <div title=\"PP1 – Learning Room | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 506 / 2389);\n  top: calc(100% * 36 / 1501);\n  width: calc(100% * 321 / 2389);\n  height: calc(100% * 144 / 1501);\n  border-radius: 0px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: clamp(16px, 2vw, 26px);\n  font-weight: bold;\n  color: white;\n  text-shadow: 0 1px 3px rgba(0,0,0,0.6);\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n    {{detections}}\n  </div>\n  {{/if}}\n\n  {{#if (eq sensor_name \"Entrance\")}}\n  <div title=\"PP2 – Check-in-1 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 657 / 2389);\n  top: calc(100% * 496 / 1501);\n  width: calc(100% * 126 / 2389);\n  height: calc(100% * 234 / 1501);\n  border-radius: 0px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: clamp(16px, 2vw, 26px);\n  font-weight: bold;\n  color: white;\n  text-shadow: 0 1px 3px rgba(0,0,0,0.6);\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n    {{detections}}\n  </div>\n\n  <div title=\"PP2 – Check-in-2 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 525 / 2389);\n  top: calc(100% * 664 / 1501);\n  width: calc(100% * 133 / 2389);\n  height: calc(100% * 185 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  <div title=\"PP2 - Check-in-3 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 783 / 2389);\n  top: calc(100% * 568 / 1501);\n  width: calc(100% * 147 / 2389);\n  height: calc(100% * 154 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  <div title=\"PP2 - Check-in-4 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 783 / 2389);\n  top: calc(100% * 722 / 1501);\n  width: calc(100% * 11 / 2389);\n  height: calc(100% * 8 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  <div title=\"PP2 - Check-in-5 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 723 / 2389);\n  top: calc(100% * 734 / 1501);\n  width: calc(100% * 73 / 2389);\n  height: calc(100% * 81 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  <div title=\"PP2 - Check-in-6 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 658 / 2389);\n  top: calc(100% * 815 / 1501);\n  width: calc(100% * 137 / 2389);\n  height: calc(100% * 34 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  <div title=\"PP2 - Check-in-7 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 572 / 2389);\n  top: calc(100% * 849 / 1501);\n  width: calc(100% * 223 / 2389);\n  height: calc(100% * 68 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  {{/if}}\n\n  {{#if (eq sensor_name \"AuditoriumS\")}}\n  <div title=\"PP3 – Auditorium (esq.) | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 1010 / 2389);\n  top: calc(100% * 483 / 1501);\n  width: calc(100% * 336 / 2389);\n  height: calc(100% * 163 / 1501);\n  border-radius: 0px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: clamp(16px, 2vw, 26px);\n  font-weight: bold;\n  color: white;\n  text-shadow: 0 1px 3px rgba(0,0,0,0.6);\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n    {{detections}}\n  </div>\n  {{/if}}\n\n  {{#if (eq sensor_name \"AuditoriumN\")}}\n  <div title=\"PP4 – Auditorium (dir.) | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 1346 / 2389);\n  top: calc(100% * 483 / 1501);\n  width: calc(100% * 338 / 2389);\n  height: calc(100% * 163 / 1501);\n  border-radius: 0px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: clamp(16px, 2vw, 26px);\n  font-weight: bold;\n  color: white;\n  text-shadow: 0 1px 3px rgba(0,0,0,0.6);\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n    {{detections}}\n  </div>\n  {{/if}}\n\n  {{#if (eq sensor_name \"InnovationCafe\")}}\n  <div title=\"PP5 – Innovation Café1 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 525 / 2389);\n  top: calc(100% * 1043 / 1501);\n  width: calc(100% * 260 / 2389);\n  height: calc(100% * 311 / 1501);\n  border-radius: 0px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: clamp(16px, 2vw, 26px);\n  font-weight: bold;\n  color: white;\n  text-shadow: 0 1px 3px rgba(0,0,0,0.6);\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n\n    {{detections}}\n  </div>\n\n  <div title=\"PP5 – Innovation Café2 | {{detections}} deteções\" style=\"\n  position: absolute;\n  left: calc(100% * 785 / 2389);\n  top: calc(100% * 1043 / 1501);\n  width: calc(100% * 10 / 2389);\n  height: calc(100% * 152 / 1501);\n  border-radius: 0px;\n  border: 0;\n  z-index: 10;\n  transition: background-color 0.3s ease, opacity 0.3s ease;\n  opacity:\n    {{#if (gte detections 80)}}0.9\n    {{else if (gte detections 60)}}0.85\n    {{else if (gte detections 40)}}0.8\n    {{else if (gte detections 20)}}0.75\n    {{else}}0.65{{/if}};\n  background-color:\n    {{#if (gte detections 80)}}#7a1f1f\n    {{else if (gte detections 60)}}#eb5757\n    {{else if (gte detections 40)}}#d4a017\n    {{else if (gte detections 20)}}#f2c94c\n    {{else if (gte detections 10)}}#4caf7d\n    {{else}}#6fcf97{{/if}};\n\">\n  </div>\n\n  {{/if}}\n\n  {{/each}}\n\n</div>",
+        "defaultContent": "The query didn't return any results.",
+        "editor": {
+          "format": "auto",
+          "height": 564,
+          "language": "handlebars"
+        },
+        "editors": [],
+        "externalScripts": [],
+        "externalStyles": [],
+        "helpers": "",
+        "renderMode": "allRows",
+        "styles": "",
+        "wrap": false
+      },
+      "pluginVersion": "4.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9o1c6yvod8ga"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"numdetections\")\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> last()\r\n  |> keep(columns: [\"sensor_name\", \"_value\"])\r\n  |> rename(columns: {_value: \"detections\"})\r\n  |> group(columns: [])       \r\n  |> sort(columns: [\"sensor_name\"])\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Floor Plan Dristribution",
+      "transparent": true,
+      "type": "marcusolsson-dynamictext-panel"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DataSource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#1fa9ac",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": true,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "RaspberryPi1": {
+                  "index": 0,
+                  "text": "Study Room"
+                },
+                "RaspberryPi2": {
+                  "index": 1,
+                  "text": "Outdoor Passage"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "(Select a value in 'Sensor' variable)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 13,
+        "x": 11,
+        "y": 7
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DataSource}"
+          },
+          "query": "base =\r\nfrom(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"numdetections\" and\r\n    r._field == \"devices_detected\"\r\n  )\r\n  |> aggregateWindow(every: 5m, fn: last, createEmpty: false)\r\n\r\nsingle =\r\nbase\r\n  |> filter(fn: (r) =>\r\n    r.sensor_name =~ /^${Sensor:regex}$/\r\n  )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: r._value,\r\n      series: r.sensor_name\r\n  }))\r\n\r\nauditorium =\r\nbase\r\n  |> filter(fn: (r) =>\r\n    r.sensor_name == \"AuditoriumN\" or r.sensor_name == \"AuditoriumS\"\r\n  )\r\n  |> group(columns: [\"_time\"])\r\n  |> sum()\r\n  |> filter(fn: (r) =>\r\n    \"${Sensor}\" =~ /(^|,|\\{)Auditorium(,|\\}|$)/\r\n  )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: r._value,\r\n      series: \"Auditório\"\r\n  }))\r\n\r\ntotal =\r\nbase\r\n  |> group(columns: [\"_time\"])\r\n  |> sum()\r\n  |> filter(fn: (r) =>\r\n    \"${Sensor}\" =~ /(^|,|\\{)Total(,|\\}|$)/\r\n  )\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: r._value,\r\n      series: \"Total\"\r\n  }))\r\n\r\nunion(tables: [single, auditorium, total])\r\n  |> group(columns: [\"series\"])\r\n  |> exponentialMovingAverage(n: 7)\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "5 min. detections",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DataSource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#1fa9ac",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": true,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [
+            {
+              "options": {
+                "RaspberryPi1": {
+                  "index": 0,
+                  "text": "Study Room"
+                },
+                "RaspberryPi2": {
+                  "index": 1,
+                  "text": "Outdoor Passage"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "(Select a value in 'Sensor' variable)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 13,
+        "x": 11,
+        "y": 17
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DataSource}"
+          },
+          "query": "import \"math\"\r\nfrom(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"devices_detected\")\r\n  |> aggregateWindow(every: 30m, fn: mean, createEmpty: false)\r\n  |> map(fn: (r) => ({\r\n      _time: r._time,\r\n      _value: r._value,\r\n      sensor_name: r.sensor_name\r\n    }))\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> yield(name: \"result\")",
+          "refId": "A"
+        }
+      ],
+      "title": "30 min. average detections",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DataSource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-RdYlGr"
+          },
+          "custom": {
+            "calculation": "sum",
+            "colorPalette": "interpolateGreens",
+            "colorSpace": "rgb",
+            "groupBy": 60,
+            "invertPalette": false,
+            "nullValueColor": "rgb(155, 155, 155)"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 13,
+        "x": 11,
+        "y": 25
+      },
+      "id": 10,
+      "options": {
+        "from": "0",
+        "legendGradientQuality": "high",
+        "showCellBorder": false,
+        "showLegend": true,
+        "showTooltip": true,
+        "showValueIndicator": false,
+        "timeFieldName": "_time",
+        "to": "0",
+        "valueFieldName": "devices_detected"
+      },
+      "pluginVersion": "2.0.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DataSource}"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: 2025-08-20T09:35:10Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> filter(fn: (r) => contains(value: r[\"sensor_name\"], set: ${Sensor:json}))\r\n  |> aggregateWindow(every: 60m, fn: mean, createEmpty: false)\r\n  |> drop(columns:[\"_start\", \"_stop\"])\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> group()",
+          "refId": "A"
+        }
+      ],
+      "title": "Heatmap",
+      "transparent": true,
+      "type": "marcusolsson-hourly-heatmap-panel"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ef9o1c6yvod8ga"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "displayName": "${__field.labels.sensor_name}",
+          "fieldMinMax": false,
+          "mappings": [],
+          "max": 130,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 15
+              },
+              {
+                "color": "light-yellow",
+                "value": 30
+              },
+              {
+                "color": "semi-dark-yellow",
+                "value": 45
+              },
+              {
+                "color": "red",
+                "value": 65
+              },
+              {
+                "color": "#801fb1",
+                "value": 90
+              },
+              {
+                "color": "text",
+                "value": 120
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 11,
+        "x": 0,
+        "y": 26
+      },
+      "id": 16,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 0,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ef9o1c6yvod8ga"
+          },
+          "query": "from(bucket: \"${Bucket}\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"devices_detected\")\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> last()\r\n  |> keep(columns: [\"_value\", \"sensor_name\"])\r\n\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DataSource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Latitude"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Longitude"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 5
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 11,
+        "x": 0,
+        "y": 36
+      },
+      "id": 9,
+      "options": {
+        "basemap": {
+          "config": {
+            "server": "world-imagery"
+          },
+          "name": "Layer 0",
+          "noRepeat": false,
+          "type": "esri-xyz"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "blur": 50,
+              "radius": 41,
+              "weight": {
+                "fixed": 1,
+                "max": 1,
+                "min": 0
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Detections",
+            "opacity": 1,
+            "tooltip": true,
+            "type": "heatmap"
+          },
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "fixed": "#ffffff"
+                },
+                "opacity": 0,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 1,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "text": {
+                  "field": "Devices Detected",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14,
+                  "offsetX": 0,
+                  "offsetY": 10,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Number",
+            "tooltip": false,
+            "type": "markers"
+          },
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "fixed": "#ffffff"
+                },
+                "opacity": 0,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "field": "",
+                  "fixed": "",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "text": {
+                  "field": "Sensor",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 16,
+                  "offsetX": 0,
+                  "offsetY": -10,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Names",
+            "tooltip": false,
+            "type": "markers"
+          }
+        ],
+        "tooltip": {
+          "mode": "none"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lastOnly": false,
+          "lat": 38.766622,
+          "layer": "Sensor Detections",
+          "lon": -9.094896,
+          "noRepeat": false,
+          "zoom": 19.13
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DataSource}"
+          },
+          "query": "t1 = from(bucket: \"${Bucket}\")\r\n  |> range(start: 2025-07-03T15:35:10Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensorLocation\" )\r\n  |> last(column: \"sensor_name\")\r\n  |> drop(columns:[\"_start\", \"_stop\"])\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> group()\r\n\r\nt2 = from(bucket: \"${Bucket}\")\r\n  |> range(start: -10m)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetections\")\r\n  |> drop(columns:[\"_start\", \"_stop\"])\r\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> last(column: \"devices_detected\")\r\n  |> group()\r\n\r\n\r\njoin( tables: {Locations: t1, Detections: t2}, on: [\"sensor_name\"])\r\n  |> group(columns: [\"sensor_name\"])\r\n  |> last(column: \"devices_detected\")\r\n  |> group()",
+          "refId": "A"
+        }
+      ],
+      "title": "Geodistribution",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_measurement_Detections": true,
+              "_measurement_Locations": true,
+              "ip_address_Detections": true,
+              "ip_address_Locations": true,
+              "sensor_uuid_Detections": true,
+              "sensor_uuid_Locations": true,
+              "technology_Detections": true,
+              "technology_Locations": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "_measurement_Detections": 6,
+              "_measurement_Locations": 7,
+              "_time_Detections": 3,
+              "_time_Locations": 5,
+              "devices_detected": 4,
+              "ip_address_Detections": 8,
+              "ip_address_Locations": 9,
+              "latitude": 1,
+              "longitude": 2,
+              "sensor_name": 0,
+              "sensor_uuid_Detections": 10,
+              "sensor_uuid_Locations": 11,
+              "technology_Detections": 12,
+              "technology_Locations": 13
+            },
+            "orderByMode": "manual",
+            "renameByName": {
+              "_time_Detections": "Last Measurement",
+              "devices_detected": "Devices Detected",
+              "latitude": "Latitude",
+              "longitude": "Longitude",
+              "sensor_name": "Sensor"
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "geomap"
+    }
+  ],
+  "preload": false,
+  "refresh": "10s",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "InfluxDB - BoostDB",
+          "value": "ef9o1c6yvod8ga"
+        },
+        "hide": 2,
+        "includeAll": false,
+        "name": "DataSource",
+        "options": [],
+        "query": "influxdb",
+        "refresh": 1,
+        "regex": "/Boost/",
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "text": "BoostDB",
+          "value": "BoostDB"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "ef9o1c6yvod8ga"
+        },
+        "definition": "buckets()",
+        "hide": 2,
+        "includeAll": false,
+        "name": "Bucket",
+        "options": [],
+        "query": "buckets()",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "allowCustomValue": false,
+        "current": {
+          "text": [
+            "Entrance",
+            "InnovationCafe",
+            "LearningRoom",
+            "Total",
+            "Auditorium"
+          ],
+          "value": [
+            "Entrance",
+            "InnovationCafe",
+            "LearningRoom",
+            "Total",
+            "Auditorium"
+          ]
+        },
+        "includeAll": true,
+        "label": "Sensor",
+        "multi": true,
+        "name": "Sensor",
+        "options": [
+          {
+            "selected": false,
+            "text": "AuditoriumN",
+            "value": "AuditoriumN"
+          },
+          {
+            "selected": false,
+            "text": "AuditoriumS",
+            "value": "AuditoriumS"
+          },
+          {
+            "selected": true,
+            "text": "Entrance",
+            "value": "Entrance"
+          },
+          {
+            "selected": true,
+            "text": "InnovationCafe",
+            "value": "InnovationCafe"
+          },
+          {
+            "selected": true,
+            "text": "LearningRoom",
+            "value": "LearningRoom"
+          },
+          {
+            "selected": true,
+            "text": "Total",
+            "value": "Total"
+          },
+          {
+            "selected": true,
+            "text": "Auditorium",
+            "value": "Auditorium"
+          }
+        ],
+        "query": "AuditoriumN,AuditoriumS,Entrance,InnovationCafe,LearningRoom,Total,Auditorium",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "2026-01-16T09:01:30.000Z",
+    "to": "2026-01-16T19:30:00.000Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Boost by Nest Dashboard",
+  "uid": "adfl68l",
+  "version": 156
+}

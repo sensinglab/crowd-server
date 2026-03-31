@@ -1,0 +1,955 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 48,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "filterable": false,
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "light-green",
+                "value": 0
+              },
+              {
+                "color": "green",
+                "value": 20
+              },
+              {
+                "color": "semi-dark-green",
+                "value": 40
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "semi-dark-orange",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 150
+              },
+              {
+                "color": "dark-red",
+                "value": 200
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sensor"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "AdmissaoPalacio": {
+                        "index": 2,
+                        "text": "Admissão do Palácio"
+                      },
+                      "ChalletCondessa": {
+                        "index": 1,
+                        "text": "Challet da Condessa"
+                      },
+                      "HelpPoint": {
+                        "index": 0,
+                        "text": "HelpPoint"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 187
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Dispositivos Detetados"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "gauge",
+                  "valueDisplayMode": "text"
+                }
+              },
+              {
+                "id": "max",
+                "value": 70
+              },
+              {
+                "id": "min",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Endereço de Rede"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 186
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Estado"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "Ativo": {
+                        "color": "green",
+                        "index": 0
+                      },
+                      "Inativo": {
+                        "color": "red",
+                        "index": 1
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "enablePagination": false,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Dispositivos Detetados"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+          },
+          "query": "from(bucket: \"MonserratePalaceDB\")\r\n  |> range(start: 2024-11-01T00:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetectionstable\" )\r\n\r\n  // *** 1) Normalize schema so old + new look identical\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      sensor_uuid: if exists r.sensor_uuid then r.sensor_uuid else \"legacy\",\r\n      type_data:   if exists r.type_data   then r.type_data   else \"all\"\r\n  }))\r\n  // ***\r\n  \r\n  |> group(columns: [\"device\"])\r\n  |> sort(columns: [\"_time\"])\r\n  |> last(column: \"device\")\r\n  |> drop(columns:[\"_start\", \"_stop\"])\r\n  |> pivot(rowKey: [\"_time\",\"ipAddress\",\"tecnology\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> group(columns: [])\r\n  |> map(fn: (r) => ({\r\n      r with\r\n      sensor_status: if (uint(v: now()) - uint(v: r._time)) <= 600000000000 then \"Ativo\" else \"Inativo\" \r\n  }))",
+          "refId": "A"
+        }
+      ],
+      "title": "Informação Geral",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_measurement": true,
+              "_measurement_t1": true,
+              "_measurement_t2": true,
+              "_time": false,
+              "_time_t1": true,
+              "_time_t2": false,
+              "latitude": true,
+              "location": true,
+              "longitude": true,
+              "tecnology": true,
+              "type_data": true,
+              "Última Localização": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "_time": 3,
+              "device": 0,
+              "devices_detected": 4,
+              "ipAddress": 2,
+              "sensor_status": 5,
+              "tecnology": 1
+            },
+            "renameByName": {
+              "Sensor": "Sensor",
+              "_time": "Última Medição",
+              "_time_t2": "Última Medição",
+              "device": "Sensor",
+              "devices_detected": "Dispositivos",
+              "ipAddress": "Endereço",
+              "sensor_status": "Estado",
+              "tecnology": "Tecnologia",
+              "Última Localização": "",
+              "Última Medição": ""
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "light-blue",
+                "value": 0
+              },
+              {
+                "color": "blue",
+                "value": 20
+              },
+              {
+                "color": "green",
+                "value": 40
+              },
+              {
+                "color": "semi-dark-green",
+                "value": 60
+              },
+              {
+                "color": "yellow",
+                "value": 80
+              },
+              {
+                "color": "dark-yellow",
+                "value": 100
+              },
+              {
+                "color": "orange",
+                "value": 120
+              },
+              {
+                "color": "dark-orange",
+                "value": 150
+              },
+              {
+                "color": "red",
+                "value": 200
+              },
+              {
+                "color": "dark-red",
+                "value": 300
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "latitude"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "longitude"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "device"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "ChalletCondessa": {
+                        "index": 1,
+                        "text": "Challet da Condessa"
+                      },
+                      "HelpPoint": {
+                        "index": 0,
+                        "text": "HelpPoint"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "Layer 0",
+          "opacity": 0.8,
+          "type": "osm-standard"
+        },
+        "controls": {
+          "mouseWheelZoom": true,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "blur": 50,
+              "radius": 42,
+              "weight": {
+                "fixed": 1,
+                "max": 1,
+                "min": 0
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Detections",
+            "tooltip": true,
+            "type": "heatmap"
+          },
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "field": "numdetections",
+                  "fixed": "text"
+                },
+                "opacity": 0,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 1,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "text": {
+                  "field": "devices_detected",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14,
+                  "offsetX": 0,
+                  "offsetY": -5,
+                  "textAlign": "center",
+                  "textBaseline": "bottom"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Number",
+            "tooltip": false,
+            "type": "markers"
+          },
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "field": "numdetections",
+                  "fixed": "#000000"
+                },
+                "opacity": 0,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 1,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "field": "",
+                  "fixed": "",
+                  "mode": "fixed"
+                },
+                "text": {
+                  "field": "device",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14,
+                  "offsetY": -20,
+                  "textAlign": "center",
+                  "textBaseline": "bottom"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Sensor Names",
+            "tooltip": false,
+            "type": "markers"
+          }
+        ],
+        "tooltip": {
+          "mode": "none"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lat": 38.793544,
+          "lon": -9.421315,
+          "noRepeat": false,
+          "shared": false,
+          "zoom": 17
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+          },
+          "query": "t1 = from(bucket: \"MonserratePalaceDB\")\n  |> range(start: 2023-08-08T00:00:00Z)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensorLocation\" )\n  |> last(column: \"device\")\n  |> drop(columns:[\"_start\", \"_stop\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> group()\n\n\nt2 = from(bucket: \"MonserratePalaceDB\")\n  |> range(start: -10m)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetectionstable\" )\n  |> drop(columns:[\"_start\", \"_stop\"])\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> last(column: \"devices_detected\")\n  |> group()\n\n\njoin( tables: {t1: t1, t2: t2}, on: [\"device\"])\n  |> group(columns: [\"device\"])\n  |> last(column: \"devices_detected\")\n  |> rename(columns: {_time_t1: \"Deployment Date\", _time_t2: \"Last Record\" }) //Renomeia colunas para melhor interpertação dos resultados (questão estética)\n  |> drop(columns:[\"_measurement_t1\", \"_measurement_t2\",\"ipaddress\", \"macAddress\",\"type_data\",\"tecnology\"])  //Elimina colunas desnecessárias \n  |> group()\n\n//union(tables: [t1,t2])",
+          "refId": "A"
+        }
+      ],
+      "title": "Geodistribuição",
+      "transparent": true,
+      "type": "geomap"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#1fa9ac",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 26,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "RaspberryPi1": {
+                  "index": 0,
+                  "text": "Study Room"
+                },
+                "RaspberryPi2": {
+                  "index": 1,
+                  "text": "Outdoor Passage"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "(Select a value in 'Sensor' variable)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HelpPoint"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HelpPoint"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ChalletCondessa"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Challet da Condessa"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AdmissaoPalacio"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Admissão do Palácio"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+          },
+          "query": "from(bucket: \"MonserratePalaceDB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetectionstable\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"devices_detected\")\r\n  |> filter(fn: (r) => contains(value: r[\"device\"], set: ${Sensor:json}))\r\n  |> map(fn: (r) => ({_value:r._value, _time:r._time, _field:r.device}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Deteções em 5 minutos",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#1fa9ac",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 26,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "RaspberryPi1": {
+                  "index": 0,
+                  "text": "Study Room"
+                },
+                "RaspberryPi2": {
+                  "index": 1,
+                  "text": "Outdoor Passage"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "(Select a value in 'Sensor' variable)",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HelpPoint"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "HelpPoint"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ChalletCondessa"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Challet da Condessa"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AdmissaoPalacio"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Admissão do Palácio"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 11
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+          },
+          "query": "from(bucket: \"MonserratePalaceDB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetectionstable30min\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"devices_detected\")\r\n  |> filter(fn: (r) => contains(value: r[\"device\"], set: ${Sensor:json}))\r\n  //|> aggregateWindow(every: v.windowPeriod, fn: mean)\r\n  |> map(fn: (r) => ({_value:r._value, _time:r._time, _field:r.device}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Deteções em 30 minutos",
+      "transparent": true,
+      "type": "timeseries"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "id": 6,
+      "options": {
+        "activeTheme": "New Theme 1",
+        "disableThemePicker": true,
+        "themes": [
+          {
+            "name": "New Theme 1",
+            "styles": [
+              {
+                "props": {
+                  "theme": "default"
+                },
+                "type": "basetheme"
+              },
+              {
+                "props": {
+                  "url": "https://imgur.com/zURpjFC.png"
+                },
+                "type": "bgimage"
+              },
+              {
+                "props": {
+                  "url": ""
+                },
+                "type": "url"
+              },
+              {
+                "props": {
+                  "text": ""
+                },
+                "type": "style"
+              },
+              {
+                "props": {
+                  "color": ""
+                },
+                "type": "panel-container-bg-color"
+              }
+            ]
+          }
+        ]
+      },
+      "pluginVersion": "0.2.1",
+      "title": "",
+      "transparent": true,
+      "type": "yesoreyeram-boomtheme-panel"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "fd0543a9-a3ef-4ad6-a72f-961e40c8fa93"
+        },
+        "definition": "from(bucket: \"MonserratePalaceDB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetectionstable\")\r\n  |> group(columns: [\"device\"])\r\n  |> distinct(column: \"device\")\r\n  |> group()",
+        "includeAll": true,
+        "label": "Sensor",
+        "multi": true,
+        "name": "Sensor",
+        "options": [],
+        "query": "from(bucket: \"MonserratePalaceDB\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"numdetectionstable\")\r\n  |> group(columns: [\"device\"])\r\n  |> distinct(column: \"device\")\r\n  |> group()",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Monitorização do Palácio de Monserrate",
+  "uid": "Yrh2rpe4z21234",
+  "version": 32
+}
