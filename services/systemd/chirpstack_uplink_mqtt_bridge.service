@@ -1,0 +1,14 @@
+[Unit]
+Description=ChirpStack HTTP -> MQTT Bridge
+After=network.target mosquitto.service
+
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/bin/chirpstack_uplink_mqtt_bridge.py
+Restart=always
+RestartSec=5
+User=root
+StandardOutput=append:/var/log/chirpstack_bridge.log
+StandardError=append:/var/log/chirpstack_bridge.log
+
+[Install]
+WantedBy=multi-user.target

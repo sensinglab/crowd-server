@@ -1,0 +1,17 @@
+[Unit]
+Description=MoniCrowd Command Dispatcher
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/etc/telegraf/scripts
+ExecStart=/usr/bin/python3 /etc/telegraf/scripts/sensor_command_dispatcher.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
