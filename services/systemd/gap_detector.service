@@ -1,0 +1,20 @@
+[Unit]
+Description=MoniCrowd LoRa Gap Detector Daemon
+Documentation=https://github.com/jpnoa1/CrowdSensor_repository
+After=network-online.target postgresql.service telegraf.service
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/monicrowd/server.env
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/gap_detector.py
+Restart=always
+RestartSec=10
+
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gap-detector
+
+[Install]
+WantedBy=multi-user.target
