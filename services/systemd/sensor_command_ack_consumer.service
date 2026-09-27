@@ -4,8 +4,9 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
+EnvironmentFile=/etc/monicrowd/server.env
 Type=simple
-User=ubuntu
+User=monicrowd
 Group=ubuntu
 WorkingDirectory=/etc/telegraf/scripts
 ExecStart=/usr/bin/python3 /etc/telegraf/scripts/sensor_command_ack_consumer.py

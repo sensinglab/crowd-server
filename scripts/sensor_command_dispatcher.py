@@ -1,35 +1,34 @@
 #!/usr/bin/env python3
-import os
 import json
 import select
 import time
 import psycopg2
 import psycopg2.extensions
 import paho.mqtt.client as mqtt
+from datetime import datetime, timezone
 
 
+import os
+
+MQTT_HOST = os.environ["MQTT_HOST"]
+MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
+MQTT_USER = os.environ["MQTT_USER"]
+MQTT_PASS = os.environ["MQTT_PASS"]
 
 PG_CONFIG = {
     "host": os.getenv("PG_HOST", "127.0.0.1"),
-    "dbname": os.getenv("PG_DB", "your_database"),
-    "user": os.getenv("PG_USER", "your_pg_user"),
-    "password": os.getenv("PG_PASS", "your_pg_password"),
+    "dbname": os.getenv("PG_DB", "sensorsconfiguration"),
+    "user": os.environ["PG_USER"],
+    "password": os.environ["PG_PASS"],
 }
 
-MQTT_HOST = os.getenv("MQTT_HOST", "localhost")
-MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
-MQTT_USER = os.getenv("MQTT_USER", "your_mqtt_username")
-MQTT_PASS = os.getenv("MQTT_PASS", "your_mqtt_password")
-
-CMD_TOPIC_PREFIX = os.getenv("CMD_TOPIC_PREFIX", "monicrowd/sensors/cmd/")
+CMD_TOPIC_PREFIX = "monicrowd/sensors/cmd/"
+SNAP_TOPIC_PREFIX = "monicrowd/sensors/config_snapshot/"
 
 PUBLISH_QOS = 1
 PUBLISH_TIMEOUT_SEC = 3
 
-# Commands that should be debounced (keep only the latest pending)
 DEBOUNCE_TYPES = {"set_config", "disable", "activate"}
-
-# Commands that should NOT be debounced
 NO_DEBOUNCE_TYPES = {"reboot", "shutdown"}
 
 
@@ -39,18 +38,15 @@ def ensure_mqtt_connected(mqttc: mqtt.Client) -> None:
     mqttc.reconnect()
 
 
-def publish_cmd(mqttc: mqtt.Client, topic: str, payload: dict) -> None:
+def publish_mqtt(mqttc: mqtt.Client, topic: str, payload: dict, retain: bool = False) -> None:
     ensure_mqtt_connected(mqttc)
-    info = mqttc.publish(topic, json.dumps(payload), qos=PUBLISH_QOS, retain=False)
+    info = mqttc.publish(topic, json.dumps(payload), qos=PUBLISH_QOS, retain=retain)
     info.wait_for_publish(timeout=PUBLISH_TIMEOUT_SEC)
     if not info.is_published():
-        raise RuntimeError("MQTT publish not confirmed (timeout)")
+        raise RuntimeError(f"MQTT publish not confirmed topic={topic}")
 
 
 def mark_skipped(cur, sensor_uuid: str, command_type: str, keep_id: int):
-    """
-    Mark older pending commands of same type for the same sensor as skipped.
-    """
     cur.execute("""
         UPDATE sensor_commands
         SET status='skipped',
@@ -64,9 +60,6 @@ def mark_skipped(cur, sensor_uuid: str, command_type: str, keep_id: int):
 
 
 def fetch_latest_pending(cur, sensor_uuid: str, command_type: str):
-    """
-    Fetch the latest pending command for (sensor_uuid, command_type).
-    """
     cur.execute("""
         SELECT id, sensor_uuid, command_type, payload
         FROM sensor_commands
@@ -88,34 +81,66 @@ def fetch_exact_pending(cur, job_id: int):
     return cur.fetchone()
 
 
+def build_config_patch(command_type: str, payload: dict) -> dict | None:
+    """
+    Só comandos que alteram configuração devem gerar snapshot.
+    reboot/shutdown não mudam config.
+    """
+    ctype = (command_type or "").strip().lower()
+
+    if ctype == "set_config":
+        return payload if isinstance(payload, dict) else {}
+
+    if ctype == "disable":
+        return {"sensor": {"Status": "Disabled"}}
+
+    if ctype == "activate":
+        return {"sensor": {"Status": "Active"}}
+
+    return None
+
+
+def merge_config(cur, sensor_uuid: str, patch: dict):
+    cur.execute(
+        "SELECT * FROM merge_sensor_config(%s, %s::jsonb)",
+        (sensor_uuid, json.dumps(patch))
+    )
+    row = cur.fetchone()
+    if not row:
+        raise RuntimeError("merge_sensor_config returned no result")
+
+    new_version, new_config = row
+    return int(new_version), new_config
+
+
 def main():
-    # MQTT
     mqttc = mqtt.Client()
     mqttc.username_pw_set(MQTT_USER, MQTT_PASS)
     mqttc.connect(MQTT_HOST, MQTT_PORT, 60)
     mqttc.loop_start()
 
-    # Postgres LISTEN
     conn = psycopg2.connect(**PG_CONFIG)
     conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
+
     cur = conn.cursor()
     cur.execute("LISTEN sensor_commands_channel;")
     cur.close()
 
-    print("[OK] command_dispatcher listening on sensor_commands_channel (with debounce)")
+    print("[OK] command_dispatcher listening on sensor_commands_channel (with config snapshots)")
 
     while True:
         if select.select([conn], [], [], 10) == ([], [], []):
             continue
 
         conn.poll()
+
         while conn.notifies:
             notify = conn.notifies.pop(0)
             job_id = int(notify.payload)
 
             c = conn.cursor()
+
             try:
-                # First, fetch the job that triggered the notify
                 row = fetch_exact_pending(c, job_id)
                 if not row:
                     continue
@@ -123,44 +148,66 @@ def main():
                 _id, sensor_uuid, command_type, payload = row
                 command_type_norm = (command_type or "").strip().lower()
 
-                # Debounce logic: if this type is debounced, always send the latest pending one
                 if command_type_norm in DEBOUNCE_TYPES:
                     latest = fetch_latest_pending(c, sensor_uuid, command_type)
+
                     if not latest:
                         continue
 
                     latest_id, sensor_uuid, command_type, payload = latest
-
-                    # Skip all other pending commands of this type for this sensor
                     mark_skipped(c, sensor_uuid, command_type, latest_id)
-
-                    # If the notify wasn't for the latest, do nothing else (latest will be sent now anyway)
                     _id = latest_id
 
                 elif command_type_norm not in NO_DEBOUNCE_TYPES:
-                    # Unknown types: treat as debounced-safe? safer is to NOT debounce.
-                    pass
+                    print(f"[WARN] unknown command_type={command_type}, sending without debounce")
+
+                patch = build_config_patch(command_type, payload)
+
+                new_version = None
+                new_config = None
+
+                if patch is not None:
+                    new_version, new_config = merge_config(c, sensor_uuid, patch)
 
                 cmd = {
                     "job_id": _id,
                     "type": command_type,
+                    "config_version": new_version,
                     "payload": payload,
                     "ts": int(time.time())
                 }
 
-                topic = CMD_TOPIC_PREFIX + str(sensor_uuid)
+                cmd_topic = CMD_TOPIC_PREFIX + str(sensor_uuid)
+                sent_ts = datetime.now(timezone.utc)            
+                publish_mqtt(mqttc, cmd_topic, cmd, retain=False)
 
-                # Publish first
-                publish_cmd(mqttc, topic, cmd)
+                if patch is not None:
+                    snapshot_topic = SNAP_TOPIC_PREFIX + str(sensor_uuid)
 
-                # Mark sent
+                    snapshot_payload = {
+                        "uuid": str(sensor_uuid),
+                        "config_version": new_version,
+                        "config": new_config,
+                        "ts": int(time.time())
+                    }
+
+                    publish_mqtt(mqttc, snapshot_topic, snapshot_payload, retain=True)
+
+                    print(
+                        f"[OK] snapshot retained uuid={sensor_uuid} "
+                        f"version={new_version}"
+                    )
+
                 c.execute("""
                     UPDATE sensor_commands
-                    SET status='sent', sent_at=NOW(), error=NULL
+                    SET status='sent', sent_at=%s, error=NULL
                     WHERE id=%s
-                """, (_id,))
+                """, (sent_ts, _id))
 
-                print(f"[OK] published+sent job={_id} uuid={sensor_uuid} type={command_type}")
+                print(
+                    f"[OK] published+sent job={_id} "
+                    f"uuid={sensor_uuid} type={command_type}"
+                )
 
             except Exception as e:
                 try:
@@ -171,6 +218,7 @@ def main():
                     """, (str(e), job_id))
                 except Exception:
                     pass
+
                 print(f"[ERROR] job={job_id} failed: {e}")
 
             finally:
